@@ -27,12 +27,12 @@ The client (C++) connects back to a listener (Python), sending XOR-encrypted com
 🛠️ Compilation (Linux -> Windows)
 
 The source file is named pay.cpp (or pypay.cpp as in your example). Use mingw-w64 to compile it to a Windows executable.
-
+'''bash
 Basic Compilation:
 bash
 
 x86_64-w64-mingw32-g++ pay.cpp -o payd1.exe -lws2_32 -static -s -Os
-
+'''
 This command:
 
     -lws2_32: Links the Windows Socket library.
