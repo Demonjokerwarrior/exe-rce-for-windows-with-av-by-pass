@@ -46,7 +46,7 @@ This command:
 To match your provided example exactly (renaming the source file):
 bash
 
-# this code needs to run == x86_64-w64-mingw32-g++ pypay.cpp -o noteexxxx.exe -lws2_32 -static -s -Os
+# this code needs to run == x86_64-w64-mingw32-g++ pay.cpp -o noteexxxx.exe -lws2_32 -static -s -Os
 
     Note: The original repository contains pay.cpp. Rename it to pypay.cpp or adjust the compilation command accordingly.
 
